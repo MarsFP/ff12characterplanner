@@ -238,17 +238,19 @@ function AbilityCell(props: { value: Ability }) {
 
 function DpsCell(props: { value: CalculateResult }) {
 	const { value } = props;
+	const aoeDps = value.aoeDps;
 	const label = `Base Damage: ${Math.round(value.baseDmg)}
 Modified Damage: ${Math.round(value.modifiedDamage)}
 Not Avoided Damage:  ${Math.round(value.nonAvoidedDamage)}
 Comboed Damage: ${Math.round(value.comboDamage)}
 Charge Time: ${value.chargeTime.toFixed(2)}s
-Animation Time: ${value.animationTime.toFixed(2)}s`;
+Animation Time: ${value.animationTime.toFixed(2)}s${aoeDps ? `
+DPS by target count:\n${aoeDps.map((d, i) => `${i + 1}: ${Math.round(d)}`).join("\n")}` : ""}`;
 	return <td
 		class="r"
 		aria-label={label}
 	>
-		{Math.round(value.dps)}
+		{aoeDps ? <span class="aoe">* </span> : null}{Math.round(value.dps)}
 	</td>;
 }
 

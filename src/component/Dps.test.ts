@@ -6,18 +6,21 @@ import PartyModel from "../model/PartyModel";
 import { Boards } from "../data/Boards";
 import { buildOptions } from "./Dps";
 import { Helm, BodyArmor } from "../dps/equip/Armor";
-import type { Equipment } from "../dps/equip/Equipment";
 import Accessory from "../dps/equip/Accessory";
+import type { Equipment } from "../dps/equip/Equipment";
 
+import { calculate } from "../dps/Calculate";
+import Magicks from "../dps/ability/Magick";
+import Technicks from "../dps/ability/Technick";
 import type { Profile } from "../dps/Profile";
 
 const ARCHER = 8;        // Bows
 const MACHINIST = 2;     // Guns
 const TIME_BATTLEMAGE = 6; // Crossbows
-const KNIGHT = 4;        // every accessory license
 const FOEBREAKER = 7;    // Hand-bombs
 const WHITE_MAGE = 0;    // no ammo weapons
 const UHLAN = 1;        // Heavy Armor
+const KNIGHT = 4;        // every accessory license
 
 // ammo options for the given job and character
 function ammos(job: number, character = 0, env = defaultEnvironment) {
@@ -174,6 +177,74 @@ describe("helm and armor dropdown options", () => {
 		assert.deepEqual([...o.armors].sort(), ["Bronze Armor", "Leather Armor"].sort());
 	});
 });
+
+
+function profileBody(env = defaultEnvironment): Profile {
+	const e = env;
+	return {
+		ability: Magicks[0],
+		damageType: "unarmed",
+		animationType: "rod",
+		attack: 0, combo: 0, chargeTime: 0,
+		str: 60, mag: 99, vit: 60, spd: 60,
+		brawler: false, berserk: e.berserk, haste: e.haste, bravery: e.bravery, faith: e.faith,
+		focus: false, adrenaline: false, serenity: false, spellbreaker: false,
+		genjiGloves: false, cameoBelt: false, agateRing: false,
+		swiftness1: false, swiftness2: false, swiftness3: false,
+		fireDamage: false, iceDamage: false, lightningDamage: false, waterDamage: false,
+		windDamage: false, earthDamage: false, darkDamage: false, holyDamage: false,
+		fireBonus: false, iceBonus: false, lightningBonus: false, waterBonus: false,
+		windBonus: false, earthBonus: false, darkBonus: false, holyBonus: false,
+	};
+}
+
+function profileWithMagick(name: string, env = defaultEnvironment): Profile {
+	return { ...profileBody(env), ability: Magicks.find(m => m.name === name)! };
+}
+
+function profileWithTechnick(name: string, env = defaultEnvironment): Profile {
+	return { ...profileBody(env), ability: Technicks.find(t => t.name === name)! };
+}
+
+describe("aoe dps per target count", () => {
+	it("aoe magick: aoeDps has 7 entries, one per target count, current one matches dps", () => {
+		const env = { ...defaultEnvironment, targetCount: 3 };
+		const result = calculate(profileWithMagick("Firaga", env), env);
+		assert.equal(result.aoeDps?.length, 7);
+		assert.ok(result.aoeDps![0] < result.aoeDps![6]);
+		assert.ok(Math.abs(result.aoeDps![2] - result.dps) < 1e-9);
+	});
+
+	it("single-target magick: no aoeDps", () => {
+		const result = calculate(profileWithMagick("Fire"), defaultEnvironment);
+		assert.equal(result.aoeDps, undefined);
+	});
+
+	// in seconds: anim(n) = 2.5 + (n>2 ? 1 : 0) * (n-2) * 0.667
+	it("gil toss: damage is split, not scaled, with target count", () => {
+		const result = calculate(profileWithTechnick("Gil Toss"), defaultEnvironment);
+		assert.equal(result.aoeDps?.length, 7);
+		// the 75-tick animation floor absorbs the first extra target's time, so 1 and 2 targets tie
+		assert.ok(Math.abs(result.aoeDps![0] - result.aoeDps![1]) < 1e-9);
+		// flat total damage: extra targets only lengthen the cast, so dps only drops
+		assert.ok(result.aoeDps![6] < result.aoeDps![0]);
+	});
+
+	it("gil toss: aoeDps matches dps for the configured target count", () => {
+		const env = { ...defaultEnvironment, targetCount: 3 };
+		const result = calculate(profileWithTechnick("Gil Toss", env), env);
+		assert.ok(Math.abs(result.aoeDps![2] - result.dps) < 1e-9);
+	});
+
+	it("horology (technick aoe, no gil-toss split): damage scales with target count", () => {
+		const result = calculate(profileWithTechnick("Horology"), defaultEnvironment);
+		assert.equal(result.aoeDps?.length, 7);
+		// no animation floor: every extra target adds dps
+		assert.ok(result.aoeDps![0] < result.aoeDps![1]);
+		assert.ok(result.aoeDps![0] < result.aoeDps![6]);
+	});
+});
+
 describe("accessory dropdown ranking", () => {
 	// Knight's board grants every accessory license, so ranking is fully observable
 	const list = gear(KNIGHT).accessories;
