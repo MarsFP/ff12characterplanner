@@ -63,6 +63,10 @@ const DPS: TPC<Props> = (_, instance) => {
 					value={env.percentHp}
 					changeValue={v => changeEnv("percentHp", v)}
 				/>
+				<HpStatus
+					focusActive={env.percentHp === 100}
+					adrenalineActive={env.percentHp < 20}
+				/>
 				<NumberInput
 					min={1}
 					max={99}
@@ -197,6 +201,22 @@ const DPS: TPC<Props> = (_, instance) => {
 }
 export default DPS;
 
+function HpStatus(props: { focusActive: boolean; adrenalineActive: boolean }) {
+	return <span class="hp-status">
+		<span
+			class={props.focusActive ? "active" : ""}
+			aria-label="1.5x damage with Focus / Serenity"
+		>
+			100%
+		</span>
+		<span
+			class={props.adrenalineActive ? "active" : ""}
+			aria-label="2x damage with Adrenaline / Spellbreaker"
+		>
+			≤15%
+		</span>
+	</span>;
+}
 
 function EqCell(props: { value?: Equipment }) {
 	const { value } = props;
