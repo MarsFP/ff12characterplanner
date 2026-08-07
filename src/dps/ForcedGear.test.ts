@@ -69,6 +69,17 @@ describe("ForcedGear", () => {
 		assert(forced.every(r => r.doll.armor?.name === "Cotton Shirt"));
 	});
 
+	// The No Accessory checkbox empties the accessory pool, so no result equips one.
+	it("noAccessory removes accessories from the results", () => {
+		const withAcc = collect(testEnv(0), partyWithJob(Job.Knight), { ability: "attack" });
+		assert(withAcc.length > 0);
+		assert(withAcc.some(r => r.doll.accessory !== undefined));
+
+		const noAcc = collect({ ...testEnv(0), noAccessory: true }, partyWithJob(Job.Knight), { ability: "attack" });
+		assert(noAcc.length > 0);
+		assert(noAcc.every(r => r.doll.accessory === undefined));
+	});
+
 	// Forced accessory must appear on every result.
 	it("forced accessory appears on all results", () => {
 		const genjiGloves = Accessory.find(a => a.name === "Genji Gloves")!;

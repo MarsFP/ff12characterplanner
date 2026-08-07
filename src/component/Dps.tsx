@@ -177,6 +177,12 @@ const DPS: TPC<Props> = (_, instance) => {
 					value={env.allowCheaterGear}
 					changeValue={v => changeEnv("allowCheaterGear", v)}
 				/>
+				<BoolInput
+					label="No Accessory"
+					tooltip="Do not equip an accessory"
+					value={env.noAccessory}
+					changeValue={v => changeEnv("noAccessory", v)}
+				/>
 				<br />
 				{AllElements.map(s => <ElementInput
 					label={s[0].toUpperCase() + s.slice(1)}
@@ -354,6 +360,7 @@ function renderComponents(results: OptimizerResult[][], env: Environment, party:
 		filters={filters[idx]}
 		setFilter={(key, value) => setFilter(idx, key, value)}
 		options={buildOptions(env, party, idx)}
+		noAccessory={env.noAccessory}
 	/>);
 }
 
@@ -467,6 +474,7 @@ interface SingleCharacterDpsProps {
 	filters: Filters;
 	setFilter: (key: keyof Filters, value: string) => void;
 	options: CharacterOptions;
+	noAccessory: boolean;
 }
 
 // one character's DPS table: constrained by dropdown selections
@@ -493,7 +501,7 @@ function SingleCharacterDps(props: SingleCharacterDpsProps) {
 			<td><Dropdown value={filters.ammo} onChange={v => props.setFilter("ammo", v)} options={dropdownOptions(options.ammos)} /></td>
 			<td><Dropdown value={filters.helm} onChange={v => props.setFilter("helm", v)} options={dropdownOptions(options.helms)} /></td>
 			<td><Dropdown value={filters.armor} onChange={v => props.setFilter("armor", v)} options={dropdownOptions(options.armors)} /></td>
-			<td><Dropdown value={filters.accessory} onChange={v => props.setFilter("accessory", v)} options={dropdownOptions(options.accessories)} /></td>
+			<td>{props.noAccessory ? undefined : <Dropdown value={filters.accessory} onChange={v => props.setFilter("accessory", v)} options={dropdownOptions(options.accessories)} />}</td>
 		</tr>
 
 		{list.map(({ ability, doll, dps }) => <tr class="data-row">
@@ -503,7 +511,7 @@ function SingleCharacterDps(props: SingleCharacterDpsProps) {
 			<EqCell value={doll.ammo} />
 			<EqCell value={doll.helm} />
 			<EqCell value={doll.armor} />
-			<EqCell value={doll.accessory} />
+			{props.noAccessory ? <td></td> : <EqCell value={doll.accessory} />}
 		</tr>)}
 	</>;
 }

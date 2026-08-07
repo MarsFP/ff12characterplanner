@@ -44,7 +44,7 @@ export function* optimizeForCharacter(e: Environment, party: PartyModel, forced?
 		ammos: forced?.ammos === null ? [] : forced?.ammos ? [forced.ammos] : undefined,
 		armors: forced?.armors === null ? [] : forced?.armors ? [forced.armors] : BodyArmor.filter(filterThing),
 		helms: forced?.helms === null ? [] : forced?.helms ? [forced.helms] : Helm.filter(filterThing),
-		accessories: forced?.accessories === null ? [] : forced?.accessories ? [forced.accessories] : Accessory.filter(filterThing)
+		accessories: (forced?.accessories === null ? [] : forced?.accessories ? [forced.accessories] : Accessory.filter(filterThing)).filter(a => !e.noAccessory)
 	};
 	const magicks = Magicks.filter(filterThing);
 	const technicks = Technicks.filter(filterThing);

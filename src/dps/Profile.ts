@@ -78,6 +78,8 @@ export interface Environment {
 	allowCertainLicenses: boolean;
 	/** Equip Seitengrat/Trango/Gendarme */
 	allowCheaterGear: boolean;
+	/** Ignore accessory entirely */
+	noAccessory: boolean;
 }
 
 export const defaultEnvironment: Environment = {
@@ -110,6 +112,7 @@ export const defaultEnvironment: Environment = {
 	weather: "other",
 	oil: false,
 	undead: false,
+	noAccessory: false,
 	allowCertainLicenses: true,
 	allowCheaterGear: true,
 };
