@@ -38,7 +38,9 @@ export function* optimizeForCharacter(e: Environment, party: PartyModel, forced?
 		return !thing.l || filterL(thing.l);
 	}
 
-	let weapons = Weapon.filter(w => filterThing(w) && (e.allowCheaterGear || w.attack! <= 150));
+	// Seitengrat, Great Trango and Wyrmhero Blade are only available with Secret Gear
+	const secretWeapons = new Set(["Seitengrat", "Great Trango", "Wyrmhero Blade"]);
+	let weapons = Weapon.filter(w => filterThing(w) && (e.allowCheaterGear || !secretWeapons.has(w.name)));
 	const pool: EquipmentPool = {
 		weapons,
 		ammos: forced?.ammos === null ? [] : forced?.ammos ? [forced.ammos] : undefined,

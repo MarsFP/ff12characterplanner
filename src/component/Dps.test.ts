@@ -133,6 +133,11 @@ describe("ammo dropdown options", () => {
 		}
 	});
 
+	it("secret gear enabled: Seitengrat's bow lets anyone equip arrows", () => {
+		const env = { ...defaultEnvironment, allowCheaterGear: true };
+		const list = ammos(WHITE_MAGE, 0, env);
+		assert.ok(list.includes("Onion Arrows"));
+	});
 });
 
 describe("helm and armor dropdown options", () => {

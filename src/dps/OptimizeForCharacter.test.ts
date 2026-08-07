@@ -62,6 +62,8 @@ function doTest({ character, job, job2, licenses, env }: TestParameters) {
 		def: 0,
 		mdef: 0,
 		level: 99,
+		// run at the old default 1% HP (adrenaline state) so these snapshot tests reproduce the old behavior.
+		percentHp: 1,
 		...env,
 	};
 	let party = new PartyModel();

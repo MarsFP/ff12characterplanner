@@ -317,8 +317,8 @@ export function buildOptions(env: Environment, party: PartyModel, character: num
 		return v === Coloring.OBTAINED || env.allowCertainLicenses && v === Coloring.CERTAIN;
 	};
 	const SECRET_WEAPONS = new Set(["Seitengrat", "Great Trango", "Wyrmhero Blade"]);
-	const isEquippable = (thing: { l?: License }) => !thing.l || isActive(thing.l);
-	const weaponTypes = new Set(Weapon.filter(w => isEquippable(w) && !SECRET_WEAPONS.has(w.name)).map(w => w.animationType));
+	const isEquippable = (thing: { l?: License }) => !thing.l || isActive(thing.l); // no req or active
+	const weaponTypes = new Set(Weapon.filter(w => isEquippable(w) && (env.allowCheaterGear || !SECRET_WEAPONS.has(w.name))).map(w => w.animationType));
 	const accessories = Accessory.filter(isEquippable);
 	accessories.sort((a, b) => accessoryRank(a) - accessoryRank(b) || a.name.localeCompare(b.name));
 	return {

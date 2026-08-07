@@ -13,6 +13,9 @@ import Ammos from "./equip/Ammo";
 // Job board indices (see Boards.ts / the existing OptimizeForCharacter.test.ts Job enum).
 const Job = { WhiteMage: 0, Uhlan: 1, Knight: 4, Foebreaker: 7, Archer: 8 } as const;
 
+// Weapons that are only available with the "Secret Gear" (allowCheaterGear) toggle.
+const SECRET_WEAPONS = ["Seitengrat", "Great Trango", "Wyrmhero Blade"];
+
 // Collect every result optimizeForCharacter yields for the given setup.
 function collect(e: Environment, party: PartyModel, forced?: ForcedGear): OptimizerResult[] {
 	const out: OptimizerResult[] = [];
@@ -32,6 +35,25 @@ function partyWithJob(job: number) {
 }
 
 describe("ForcedGear", () => {
+	// The default environment must not enable secret gear and should start at 99% HP,
+	// so Focus/Adrenaline are inactive and Focus/Adrenaline gear is not auto-seleted.
+	it("default environment: 99% HP, secret gear disabled", () => {
+		assert.equal(defaultEnvironment.percentHp, 99);
+		assert.equal(defaultEnvironment.allowCheaterGear, false);
+	});
+
+	// Seitengrat/Great Trango/Wyrmhero Blade must only appear when allowCheaterGear is set.
+	it("secret weapons are gated behind allowCheaterGear", () => {
+		const party = partyWithJob(Job.Foebreaker);
+		const e = testEnv(0);
+
+		const withoutSecret = collect(e, party);
+		assert(!withoutSecret.some(r => SECRET_WEAPONS.includes(r.doll.weapon.name)));
+
+		const withSecret = collect({ ...e, allowCheaterGear: true }, party);
+		assert(withSecret.some(r => SECRET_WEAPONS.includes(r.doll.weapon.name)));
+	});
+
 	// Forcing an ability kind must restrict every yielded result to that kind.
 	it("forced ability restricts the result ability kind", () => {
 		const e = testEnv(0);

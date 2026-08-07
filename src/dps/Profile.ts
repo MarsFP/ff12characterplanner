@@ -87,7 +87,7 @@ export const defaultEnvironment: Environment = {
 	def: 30,
 	mdef: 30,
 	targetCount: 1,
-	percentHp: 1,
+	percentHp: 99,
 	fireReaction: 1,
 	iceReaction: 1,
 	lightningReaction: 1,
@@ -114,7 +114,7 @@ export const defaultEnvironment: Environment = {
 	undead: false,
 	noAccessory: false,
 	allowCertainLicenses: true,
-	allowCheaterGear: true,
+	allowCheaterGear: false,
 };
 
 export interface Profile {
@@ -227,6 +227,7 @@ export function createProfile(startingProfile: Profile, doll: PaperDoll) {
 /** The items available to a particular character to equip */
 export interface EquipmentPool {
 	weapons: Equipment[];
+	/** Overrides the global ammo list (e.g. when a specific ammo is forced). */
 	ammos?: Equipment[];
 	armors: Equipment[];
 	helms: Equipment[];
