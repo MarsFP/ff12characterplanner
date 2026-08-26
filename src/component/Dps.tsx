@@ -495,7 +495,14 @@ function SingleCharacterDps(props: SingleCharacterDpsProps) {
 			<th>Accessory</th>
 		</tr>
 		<tr class="sticky filter-row">
-			<td><input class="filter" type="number" min="0" max="100" value={filters.topN} onChange={ev => props.setFilter("topN", +ev.currentTarget.value)} /></td>
+			<td>
+				<button
+					class="filter-toggle"
+					title={filters.topN === 5 ? "Show all results" : "Show 5 results"}
+					onClick={() => props.setFilter("topN", filters.topN === 5 ? 99 : 5)}
+				>{filters.topN > 5 ? "▲" : "▼"}</button>
+				<input class="filter" type="number" min="0" max="99" value={filters.topN} onChange={ev => props.setFilter("topN", +ev.currentTarget.value)} />
+			</td>
 			<td><Dropdown value={filters.ability} onChange={v => props.setFilter("ability", v)} options={ABILITY_OPTIONS} /></td>
 			<td><Dropdown value={filters.weapon} onChange={v => props.setFilter("weapon", v)} options={weaponOptions(options.weaponTypes)} /></td>
 			<td><Dropdown value={filters.ammo} onChange={v => props.setFilter("ammo", v)} options={dropdownOptions(options.ammos)} /></td>

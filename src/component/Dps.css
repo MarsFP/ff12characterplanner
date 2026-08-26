@@ -77,6 +77,25 @@
 				top: 40px;
 				height: auto;
 
+				.filter-toggle {
+					width: 1.5em;
+					height: 2em;
+					padding: 0;
+					font-size: 0.75em;
+					line-height: 1;
+					vertical-align: middle;
+				}
+
+				input.filter[type=number] {
+					width: 3.5em;
+					height: 1.5em;
+					text-align: right;
+				}
+
+				input.filter[type=number]::-webkit-inner-spin-button {
+					height: auto;
+				}
+
 				select {
 					width: 100%;
 					min-width: 70px;
